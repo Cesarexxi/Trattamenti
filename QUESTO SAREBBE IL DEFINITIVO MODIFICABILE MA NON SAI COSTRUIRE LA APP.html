@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Miscela</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f0f0;
+            color: #111827;
+        }
+        .container {
+            background-color: #e5e7eb;
+            box-shadow: 6px 6px 0px #4b5563;
+            border: 2px solid #6b7280;
+            border-radius: 0;
+            padding: 1.5rem;
+        }
+        h1 {
+            color: #242424;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        label {
+            color: #4b5563;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.375rem;
+            display: block;
+        }
+        select, input[type="text"], input[type="number"] {
+            font-size: 1.125rem;
+            padding: 0.5rem;
+            border: 2px solid #6b7280;
+            border-radius: 0;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+            background-color: #f9fafb;
+            color: #111827;
+        }
+        select:focus, input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px #4b5563;
+            border-color: #374151;
+        }
+        .gruppo-checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.375rem;
+        }
+        .gruppo-checkbox {
+            margin-right: 0.75rem;
+            transform: scale(1.75);
+        }
+        .appezzamento-checkbox-label {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 0.25rem;
+            justify-content: space-between;
+        }
+        .appezzamento-checkbox {
+            margin-right: 0.75rem;
+            transform: scale(1.75);
+        }
+        .appezzamento-nome {
+            margin-right: 0.5rem;
+            font-size: 1rem;
+            color: #1f2937;
+            flex-grow: 1;
+        }
+        .appezzamento-superficie {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #111827;
+            text-align: right;
+            display: inline-block;
+            width: 5em;
+            white-space: nowrap; /* Impedisce al testo di andare a capo */
+        }
+        button {
+            font-size: 1.125rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            box-shadow: 2px 2px 0px #386641;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        button:hover {
+            background-color: #45a049;
+            box-shadow: 0 0 0 0;
+        }
+        .button-secondary {
+            background-color: #f44336;
+            box-shadow: 2px 2px 0px #a31a1a;
+        }
+        .button-secondary:hover {
+            background-color: #d32f2f;
+        }
+        #risultato {
+            font-size: 1.125rem;
+            padding: 1rem;
+            background-color: #f0fdf4;
+            border-left: 4px solid #34d399;
+            color: #065f46;
+            border-radius: 0;
+            margin-top: 1rem;
+            border: 2px solid #34d399;
+        }
+
+        /* Colori per gruppo (esempi, puoi aggiungere altri) */
+        .gruppo-fratte { background-color: #fde68a; color: #78350f; }
+        .gruppo-zona-nord { background-color: #bae6fd; color: #0e7490; }
+        .gruppo-zona-sud { background-color: #fca5a5; color: #991b1b; }
+        .gruppo-paese { background-color: #d8b4fe; color: #5b21b6; }
+        /* Colori predefiniti per i nuovi gruppi, per evitare che siano tutti uguali */
+        .gruppo-default-0 { background-color: #e0f2f7; color: #00796b; } /* light cyan */
+        .gruppo-default-1 { background-color: #ffe0b2; color: #e65100; } /* light orange */
+        .gruppo-default-2 { background-color: #dcedc8; color: #33691e; } /* light green */
+        .gruppo-default-3 { background-color: #f8bbd0; color: #ad1457; } /* light pink */
+        .gruppo-default-4 { background-color: #bbdefb; color: #1565c0; } /* light blue */
+
+        .gruppo-fratte-border { border-color: #fcd34d; }
+        .gruppo-zona-nord-border { border-color: #67e8f9; }
+        .gruppo-zona-sud-border { border-color: #f87171; }
+        .gruppo-paese-border { border-color: #d946ef; }
+        /* Border colors for new default groups */
+        .gruppo-default-0-border { border-color: #00bcd4; }
+        .gruppo-default-1-border { border-color: #ff9800; }
+        .gruppo-default-2-border { border-color: #8bc34a; }
+        .gruppo-default-3-border { border-color: #e91e63; }
+        .gruppo-default-4-border { border-color: #2196f3; }
+
+
+        .font-bold {
+            font-weight: 600;
+        }
+        /* Classe per nascondere gli elementi */
+        .hidden {
+            display: none;
+        }
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .gruppo-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #d1d5db;
+        }
+        .gruppo-list-item:last-child {
+            border-bottom: none;
+        }
+        .gruppo-list-item button {
+            width: auto;
+            margin-left: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="container mx-auto rounded-lg shadow-md">
+
+        <div id="main-screen">
+            <div class="header-main">
+                <h1 class="text-3xl font-bold text-green-600">Calcolatore Miscela</h1>
+                <button id="modifica-fondi-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md text-base w-auto">MODIFICA FONDI</button>
+            </div>
+
+            <div class="mb-4">
+                <label for="ettari_per_ettaro" class="block text-gray-700 text-lg font-semibold mb-2">Ettolitri per Ettaro:</label>
+                <select id="ettari_per_ettaro" class="shadow appearance-none border rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xl">
+                    <option value="8">8 ettolitri/ettaro</option>
+                    <option value="9">9 ettolitri/ettaro</option>
+                    <option value="10">10 ettolitri/ettaro</option>
+                    <option value="11" selected>11 ettolitri/ettaro</option>
+                    <option value="12">12 ettolitri/ettaro</option>
+                    <option value="13">13 ettolitri/ettaro</option>
+                    <option value="14">14 ettolitri/ettaro</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="appezzamenti" class="block text-gray-700 text-lg font-semibold mb-2">Seleziona Appezzamenti:</label>
+                <div id="appezzamenti-main" class="space-y-2">
+                    </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-3 rounded-md" role="alert">
+                    <p class="font-bold text-lg">Risultato:</p>
+                    <p id="risultato-main" class="text-xl">Seleziona gli appezzamenti per calcolare il totale.</p>
+                </div>
+            </div>
+
+            <button id="calcola_bottone" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline text-xl w-full">Calcola Miscela</button>
+        </div>
+
+        <div id="manage-screen" class="hidden">
+            <div class="header-main">
+                <h1 class="text-3xl font-bold text-gray-800">Gestione Appezzamenti</h1>
+                <button id="torna-al-calcolatore-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md text-base w-auto">TORNA AL CALCOLATORE</button>
+            </div>
+
+            <div class="mb-6 p-4 border border-gray-400 rounded-md bg-gray-200">
+                <h2 class="text-2xl font-bold text-gray-800 mb-3">Gestione Gruppi</h2>
+                <input type="hidden" id="gruppo_id_input">
+                <div class="mb-3">
+                    <label for="gruppo_nome_input" class="block text-gray-700 font-semibold mb-1">Nome Gruppo:</label>
+                    <input type="text" id="gruppo_nome_input" class="w-full px-3 py-2 border rounded" placeholder="Esempio: Nuovi Appezzamenti">
+                </div>
+                <div class="flex space-x-2">
+                    <button id="aggiungi_gruppo_button" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md w-1/2">Aggiungi Gruppo</button>
+                    <button id="annulla_modifica_gruppo_button" class="button-secondary text-white font-bold py-2 px-4 rounded-md w-1/2">Annulla Modifica Gruppo</button>
+                </div>
+                <div id="gruppi-list" class="mt-4 border-t border-gray-400 pt-4">
+                    </div>
+            </div>
+
+
+            <div class="mb-6 p-4 border border-gray-400 rounded-md bg-gray-200">
+                <h2 class="text-2xl font-bold text-gray-800 mb-3">Aggiungi/Modifica Appezzamento</h2>
+                <input type="hidden" id="appezzamento_id">
+                <div class="mb-3">
+                    <label for="appezzamento_nome_input" class="block text-gray-700 font-semibold mb-1">Nome Appezzamento:</label>
+                    <input type="text" id="appezzamento_nome_input" class="w-full px-3 py-2 border rounded" placeholder="Nome Appezzamento">
+                </div>
+                <div class="mb-3">
+                    <label for="appezzamento_gruppo_select" class="block text-gray-700 font-semibold mb-1">Gruppo:</label>
+                    <select id="appezzamento_gruppo_select" class="w-full px-3 py-2 border rounded">
+                        </select>
+                </div>
+                <div class="mb-3">
+                    <label for="appezzamento_superficie_input" class="block text-gray-700 font-semibold mb-1">Superficie (ha):</label>
+                    <input type="number" id="appezzamento_superficie_input" step="0.0001" class="w-full px-3 py-2 border rounded" placeholder="Esempio: 0.3687">
+                </div>
+                <div class="flex space-x-2">
+                    <button id="aggiungi_appezzamento_button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md w-1/2">Aggiungi Appezzamento</button>
+                    <button id="annulla_modifica_button" class="button-secondary text-white font-bold py-2 px-4 rounded-md w-1/2">Annulla Modifica Appezzamento</button>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="appezzamenti-manage" class="block text-gray-700 text-lg font-semibold mb-2">Lista Appezzamenti:</label>
+                <div id="appezzamenti-manage" class="space-y-2">
+                    </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const ettariPerEttaroSelect = document.getElementById("ettari_per_ettaro");
+        const risultatoMainDiv = document.getElementById("risultato-main");
+        const calcolaBottone = document.getElementById("calcola_bottone");
+        const appezzamentiMainDiv = document.getElementById("appezzamenti-main");
+
+        const mainScreen = document.getElementById("main-screen");
+        const manageScreen = document.getElementById("manage-screen");
+        const modificaFondiButton = document.getElementById("modifica-fondi-button");
+        const tornaAlCalcolatoreButton = document.getElementById("torna-al-calcolatore-button");
+
+        // Elementi per la gestione degli appezzamenti
+        const appezzamentoIdInput = document.getElementById("appezzamento_id");
+        const appezzamentoNomeInput = document.getElementById("appezzamento_nome_input");
+        const appezzamentoGruppoSelect = document.getElementById("appezzamento_gruppo_select"); // Cambiato da input a select
+        const appezzamentoSuperficieInput = document.getElementById("appezzamento_superficie_input");
+        const aggiungiAppezzamentoButton = document.getElementById("aggiungi_appezzamento_button");
+        const annullaModificaAppezzamentoButton = document.getElementById("annulla_modifica_button"); // Rinomina per chiarezza
+        const appezzamentiManageDiv = document.getElementById("appezzamenti-manage");
+
+        // Elementi per la gestione dei gruppi
+        const gruppoIdInput = document.getElementById("gruppo_id_input");
+        const gruppoNomeInput = document.getElementById("gruppo_nome_input");
+        const aggiungiGruppoButton = document.getElementById("aggiungi_gruppo_button");
+        const annullaModificaGruppoButton = document.getElementById("annulla_modifica_gruppo_button");
+        const gruppiListDiv = document.getElementById("gruppi-list");
+
+
+        let appezzamentiData = [];
+        let gruppiData = []; // Nuovo array per i gruppi
+        let editingAppezzamentoId = null;
+        let editingGruppoId = null;
+
+        // Funzioni per mostrare/nascondere le schermate
+        function showMainScreen() {
+            mainScreen.classList.remove('hidden');
+            manageScreen.classList.add('hidden');
+            visualizzaAppezzamentiMain(); // Ricarica gli appezzamenti per la schermata principale
+            risultatoMainDiv.textContent = `Seleziona gli appezzamenti per calcolare il totale.`; // Resetta il risultato
+        }
+
+        function showManageScreen() {
+            mainScreen.classList.add('hidden');
+            manageScreen.classList.remove('hidden');
+            visualizzaAppezzamentiManage(); // Ricarica gli appezzamenti per la schermata di gestione
+            visualizzaGruppi(); // Ricarica la lista dei gruppi
+            pulisciFormAppezzamento(); // Pulisce il form appezzamento
+            pulisciFormGruppo(); // Pulisce il form gruppo
+            populateGruppoSelect(); // Popola la select del gruppo
+        }
+
+        // Funzione per caricare gli appezzamenti e i gruppi da localStorage
+        function caricaDati() {
+            const storedAppezzamenti = localStorage.getItem('appezzamenti');
+            if (storedAppezzamenti) {
+                appezzamentiData = JSON.parse(storedAppezzamenti);
+            } else {
+                // Dati appezzamenti iniziali se localStorage è vuoto
+                 appezzamentiData = [
+                    { id: Date.now() + 1, gruppo: "Fratte", nome: "Fratte Pellegrini", superficie_ha: 0.3687 },
+                    { id: Date.now() + 2, gruppo: "Fratte", nome: "Peri", superficie_ha: 0.3476 },
+                    { id: Date.now() + 3, gruppo: "Fratte", nome: "Piramidi", superficie_ha: 0.6535 },
+                    { id: Date.now() + 4, gruppo: "Fratte", nome: "Banal", superficie_ha: 0.3455 },
+                    { id: Date.now() + 5, gruppo: "Fratte", nome: "Kaswalder", superficie_ha: 0.385 },
+                    { id: Date.now() + 6, gruppo: "Fratte", nome: "Bortol", superficie_ha: 0.3845 },
+                    { id: Date.now() + 7, gruppo: "Fratte", nome: "Tone", superficie_ha: 0.1601 },
+                    { id: Date.now() + 8, gruppo: "Zona Nord", nome: "Zento", superficie_ha: 0.2988 },
+                    { id: Date.now() + 9, gruppo: "Zona Nord", nome: "Molo", superficie_ha: 0.2013 },
+                    { id: Date.now() + 10, gruppo: "Zona Nord", nome: "Second Casel Grigio", superficie_ha: 0.2187 },
+                    { id: Date.now() + 11, gruppo: "Zona Nord", nome: "Second Casel Bianco", superficie_ha: 0.1622 },
+                    { id: Date.now() + 12, gruppo: "Zona Nord", nome: "Piovi Chardonnay", superficie_ha: 0.154 },
+                    { id: Date.now() + 13, gruppo: "Zona Nord", nome: "Piovi Grigio", superficie_ha: 0.3 },
+                    { id: Date.now() + 14, gruppo: "Zona Nord", nome: "Piovi Nonna", superficie_ha: 0.5366 },
+                    { id: Date.now() + 15, gruppo: "Zona Nord", nome: "Collina Maso", superficie_ha: 0.2433 },
+                    { id: Date.now() + 16, gruppo: "Zona Nord", nome: "Coe Nonno", superficie_ha: 0.5344 },
+                    { id: Date.now() + 17, gruppo: "Zona Nord", nome: "Sort", superficie_ha: 0.7484 },
+                    { id: Date.now() + 18, gruppo: "Zona Nord", nome: "Quaranta", superficie_ha: 1.2529 },
+                    { id: Date.now() + 19, gruppo: "Zona Nord", nome: "Adige", superficie_ha: 1.128 },
+                    { id: Date.now() + 20, gruppo: "Zona Sud", nome: "Grumone", superficie_ha: 0.6079 },
+                    { id: Date.now() + 21, gruppo: "Zona Sud", nome: "Grumino", superficie_ha: 0.1363 },
+                    { id: Date.now() + 22, gruppo: "Zona Sud", nome: "Centralino", superficie_ha: 0.1874 },
+                    { id: Date.now() + 23, gruppo: "Zona Sud", nome: "Albere Grandi", superficie_ha: 0.7349 },
+                    { id: Date.now() + 24, gruppo: "Zona Sud", nome: "Albere Schlogen", superficie_ha: 0.241 },
+                    { id: Date.now() + 25, gruppo: "Zona Sud", nome: "Ribiani", superficie_ha: 0.2775 },
+                    { id: Date.now() + 26, gruppo: "Zona Sud", nome: "Violetta", superficie_ha: 0.235 },
+                    { id: Date.now() + 27, gruppo: "Zona Sud", nome: "Carlaio", superficie_ha: 0.3296 },
+                    { id: Date.now() + 28, gruppo: "Zona Sud", nome: "Piazza D\'armi", superficie_ha: 0.1455 },
+                    { id: Date.now() + 29, gruppo: "Zona Sud", nome: "GaggiGrigio", superficie_ha: 0.8983 },
+                    { id: Date.now() + 30, gruppo: "Zona Sud", nome: "TondoGrigio", superficie_ha: 0.193 },
+                    { id: Date.now() + 31, gruppo: "Zona Sud", nome: "TondoChardonnay", superficie_ha: 0.3623 },
+                    { id: Date.now() + 32, gruppo: "Zona Sud", nome: "GaggiLagrein", superficie_ha: 0.5195 },
+                    { id: Date.now() + 33, gruppo: "Zona Sud", nome: "Mendini", superficie_ha: 0.3782 },
+                    { id: Date.now() + 34, gruppo: "Paese", nome: "Praelisi", superficie_ha: 0.3942 },
+                    { id: Date.now() + 35, gruppo: "Paese", nome: "Eghet", superficie_ha: 0.514 },
+                    { id: Date.now() + 36, gruppo: "Paese", nome: "Camorz", superficie_ha: 0.1841 },
+                ];
+                salvaAppezzamenti();
+            }
+
+            const storedGruppi = localStorage.getItem('gruppi');
+            if (storedGruppi) {
+                gruppiData = JSON.parse(storedGruppi);
+            } else {
+                // Dati gruppi iniziali se localStorage è vuoto
+                gruppiData = [
+                    { id: 'fratte_id', nome: "Fratte" },
+                    { id: 'zona_nord_id', nome: "Zona Nord" },
+                    { id: 'zona_sud_id', nome: "Zona Sud" },
+                    { id: 'paese_id', nome: "Paese" }
+                ];
+                salvaGruppi();
+            }
+        }
+
+        // Funzione per salvare gli appezzamenti in localStorage
+        function salvaAppezzamenti() {
+            localStorage.setItem('appezzamenti', JSON.stringify(appezzamentiData));
+        }
+
+        // Funzione per salvare i gruppi in localStorage
+        function salvaGruppi() {
+            localStorage.setItem('gruppi', JSON.stringify(gruppiData));
+        }
+
+        // Funzione per ottenere la classe di colore per un gruppo
+        function getGruppoClasses(gruppoNome) {
+            let className = '';
+            let borderClassName = '';
+            switch (gruppoNome) {
+                case "Fratte":
+                    className = "gruppo-fratte";
+                    borderClassName = "gruppo-fratte-border";
+                    break;
+                case "Zona Nord":
+                    className = "gruppo-zona-nord";
+                    borderClassName = "gruppo-zona-nord-border";
+                    break;
+                case "Zona Sud":
+                    className = "gruppo-zona-sud";
+                    borderClassName = "gruppo-zona-sud-border";
+                    break;
+                case "Paese":
+                    className = "gruppo-paese";
+                    borderClassName = "gruppo-paese-border";
+                    break;
+                default:
+                    // Assegna classi predefinite basate sull'indice del gruppo
+                    const groupIndex = gruppiData.findIndex(g => g.nome === gruppoNome);
+                    if (groupIndex !== -1) {
+                        const defaultColorIndex = groupIndex % 5; // Usa 5 colori predefiniti a rotazione
+                        className = `gruppo-default-${defaultColorIndex}`;
+                        borderClassName = `gruppo-default-${defaultColorIndex}-border`;
+                    } else {
+                        // Fallback se il gruppo non è trovato (non dovrebbe accadere se la logica è corretta)
+                        className = "bg-gray-100 text-gray-800";
+                        borderClassName = "border-gray-400";
+                    }
+                    break;
+            }
+            return { className, borderClassName };
+        }
+
+        // Funzione per visualizzare gli appezzamenti nella schermata principale (solo checkbox)
+        function visualizzaAppezzamentiMain() {
+            appezzamentiMainDiv.innerHTML = ''; // Pulisce il contenuto precedente
+
+            // Ordina i gruppi per visualizzazione
+            const gruppiOrdinati = gruppiData.map(g => g.nome);
+
+            gruppiOrdinati.forEach(gruppo => {
+                const appezzamentiNelGruppo = appezzamentiData.filter(appezzamento => appezzamento.gruppo === gruppo);
+
+                if (appezzamentiNelGruppo.length > 0) { // Mostra il gruppo solo se ha appezzamenti
+                    const gruppoDiv = document.createElement("div");
+                    const { className, borderClassName } = getGruppoClasses(gruppo);
+                    gruppoDiv.classList.add("mb-4", "p-3", "rounded-md", "border", "border-gray-200", className, borderClassName);
+
+                    const gruppoCheckbox = document.createElement("input");
+                    gruppoCheckbox.type = "checkbox";
+                    gruppoCheckbox.classList.add("mr-3", "gruppo-checkbox");
+                    gruppoCheckbox.id = `select-group-main-${gruppo.replace(/\s/g, '_')}`; // ID univoco per il gruppo
+                    gruppoCheckbox.setAttribute('data-gruppo', gruppo);
+
+                    const gruppoLabel = document.createElement("label");
+                    gruppoLabel.textContent = gruppo;
+                    gruppoLabel.htmlFor = `select-group-main-${gruppo.replace(/\s/g, '_')}`;
+                    gruppoLabel.classList.add("text-xl", "font-semibold", "gruppo-checkbox-label");
+                    gruppoLabel.style.fontWeight = 'bold';
+                    gruppoLabel.prepend(gruppoCheckbox);
+                    gruppoDiv.appendChild(gruppoLabel);
+
+                    const gruppoList = document.createElement("ul");
+                    gruppoList.classList.add("space-y-2", "mt-2");
+
+                    appezzamentiNelGruppo.forEach(appezzamento => {
+                        const li = document.createElement("li");
+                        const checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.value = appezzamento.superficie_ha;
+                        checkbox.classList.add("mr-3", "appezzamento-checkbox");
+                        checkbox.setAttribute('data-gruppo', gruppo);
+                        checkbox.setAttribute('data-appezzamento-id', appezzamento.id);
+                        const nomeSpan = document.createElement("span");
+                        nomeSpan.textContent = appezzamento.nome;
+                        nomeSpan.classList.add("appezzamento-nome");
+
+                        const superficieSpan = document.createElement("span");
+                        superficieSpan.textContent = `${appezzamento.superficie_ha.toFixed(4)} ha`;
+                        superficieSpan.classList.add("appezzamento-superficie");
+                        superficieSpan.style.whiteSpace = 'nowrap';
+
+                        const label = document.createElement("label");
+                        label.classList.add("appezzamento-checkbox-label");
+                        label.appendChild(checkbox);
+                        label.appendChild(nomeSpan);
+                        label.appendChild(superficieSpan);
+
+                        li.appendChild(label);
+                        li.classList.add("py-1", "border-b", "border-gray-200", "text-lg");
+                        gruppoList.appendChild(li);
+                    });
+
+                    gruppoDiv.appendChild(gruppoList);
+                    appezzamentiMainDiv.appendChild(gruppoDiv);
+
+                    gruppoCheckbox.addEventListener('change', function() {
+                        const gruppoSelezionato = this.getAttribute('data-gruppo');
+                        const checkboxesInGruppo = gruppoDiv.querySelectorAll(`.appezzamento-checkbox[data-gruppo="${gruppoSelezionato}"]`);
+                        checkboxesInGruppo.forEach(checkbox => {
+                            checkbox.checked = this.checked;
+                        });
+                    });
+                }
+            });
+        }
+
+        // Funzione per visualizzare gli appezzamenti nella schermata di gestione (con bottoni modifica/rimuovi)
+        function visualizzaAppezzamentiManage() {
+            appezzamentiManageDiv.innerHTML = ''; // Pulisce il contenuto precedente
+
+            const gruppiOrdinati = gruppiData.map(g => g.nome);
+
+            gruppiOrdinati.forEach(gruppo => {
+                const appezzamentiNelGruppo = appezzamentiData.filter(appezzamento => appezzamento.gruppo === gruppo);
+
+                if (appezzamentiNelGruppo.length > 0) { // Mostra il gruppo solo se ha appezzamenti
+                    const gruppoDiv = document.createElement("div");
+                    const { className, borderClassName } = getGruppoClasses(gruppo);
+                    gruppoDiv.classList.add("mb-4", "p-3", "rounded-md", "border", "border-gray-200", className, borderClassName);
+
+                    const gruppoLabel = document.createElement("label");
+                    gruppoLabel.textContent = gruppo;
+                    gruppoLabel.classList.add("text-xl", "font-semibold", "gruppo-checkbox-label");
+                    gruppoLabel.style.fontWeight = 'bold';
+                    gruppoDiv.appendChild(gruppoLabel);
+
+                    const gruppoList = document.createElement("ul");
+                    gruppoList.classList.add("space-y-2", "mt-2");
+
+                    appezzamentiNelGruppo.forEach(appezzamento => {
+                        const li = document.createElement("li");
+                        li.classList.add("py-1", "border-b", "border-gray-200", "text-lg", "flex", "items-center", "justify-between");
+
+                        const infoSpan = document.createElement("span");
+                        infoSpan.classList.add("flex-grow");
+                        infoSpan.innerHTML = `<span class="appezzamento-nome">${appezzamento.nome}</span> <span class="appezzamento-superficie">${appezzamento.superficie_ha.toFixed(4)} ha</span>`;
+
+                        const buttonsDiv = document.createElement("div");
+                        buttonsDiv.classList.add("flex", "space-x-2", "ml-2");
+
+                        const modificaButton = document.createElement("button");
+                        modificaButton.textContent = "Modifica";
+                        modificaButton.classList.add("bg-yellow-500", "hover:bg-yellow-700", "text-white", "font-bold", "py-1", "px-2", "rounded-md", "text-sm", "w-auto");
+                        modificaButton.addEventListener('click', () => modificaAppezzamento(appezzamento.id));
+
+                        const rimuoviButton = document.createElement("button");
+                        rimuoviButton.textContent = "Rimuovi";
+                        rimuoviButton.classList.add("bg-red-500", "hover:bg-red-700", "text-white", "font-bold", "py-1", "px-2", "rounded-md", "text-sm", "w-auto");
+                        rimuoviButton.addEventListener('click', () => rimuoviAppezzamento(appezzamento.id));
+
+                        buttonsDiv.appendChild(modificaButton);
+                        buttonsDiv.appendChild(rimuoviButton);
+
+                        li.appendChild(infoSpan);
+                        li.appendChild(buttonsDiv);
+                        gruppoList.appendChild(li);
+                    });
+
+                    gruppoDiv.appendChild(gruppoList);
+                    appezzamentiManageDiv.appendChild(gruppoDiv);
+                }
+            });
+        }
+
+        // Funzione per popolare il dropdown dei gruppi nella sezione di gestione appezzamenti
+        function populateGruppoSelect() {
+            appezzamentoGruppoSelect.innerHTML = '';
+            gruppiData.forEach(gruppo => {
+                const option = document.createElement('option');
+                option.value = gruppo.nome;
+                option.textContent = gruppo.nome;
+                appezzamentoGruppoSelect.appendChild(option);
+            });
+            if (gruppiData.length === 0) {
+                 const option = document.createElement('option');
+                 option.value = '';
+                 option.textContent = 'Nessun Gruppo Disponibile';
+                 appezzamentoGruppoSelect.appendChild(option);
+                 appezzamentoGruppoSelect.disabled = true; // Disabilita se non ci sono gruppi
+            } else {
+                 appezzamentoGruppoSelect.disabled = false;
+            }
+        }
+
+
+        // Funzioni per la gestione degli appezzamenti
+        function aggiungiAppezzamento() {
+            const nome = appezzamentoNomeInput.value.trim();
+            const gruppo = appezzamentoGruppoSelect.value; // Ottieni il valore dalla select
+            const superficie = parseFloat(appezzamentoSuperficieInput.value);
+
+            if (!gruppo) {
+                 alert("Seleziona un gruppo per l'appezzamento.");
+                 return;
+            }
+
+            if (nome && !isNaN(superficie) && superficie > 0) {
+                if (editingAppezzamentoId) {
+                    const index = appezzamentiData.findIndex(a => a.id === editingAppezzamentoId);
+                    if (index !== -1) {
+                        appezzamentiData[index] = {
+                            ...appezzamentiData[index],
+                            nome: nome,
+                            gruppo: gruppo,
+                            superficie_ha: superficie
+                        };
+                    }
+                } else {
+                    const nuovoAppezzamento = {
+                        id: Date.now(),
+                        nome: nome,
+                        gruppo: gruppo,
+                        superficie_ha: superficie
+                    };
+                    appezzamentiData.push(nuovoAppezzamento);
+                }
+                salvaAppezzamenti();
+                visualizzaAppezzamentiManage();
+                pulisciFormAppezzamento();
+            } else {
+                alert("Inserisci un nome, seleziona un gruppo e una superficie (maggiore di zero) validi per l'appezzamento.");
+            }
+        }
+
+        function modificaAppezzamento(id) {
+            const appezzamentoDaModificare = appezzamentiData.find(a => a.id === id);
+            if (appezzamentoDaModificare) {
+                editingAppezzamentoId = id;
+                appezzamentoNomeInput.value = appezzamentoDaModificare.nome;
+                appezzamentoGruppoSelect.value = appezzamentoDaModificare.gruppo; // Imposta il valore della select
+                appezzamentoSuperficieInput.value = appezzamentoDaModificare.superficie_ha;
+                aggiungiAppezzamentoButton.textContent = "Salva Modifiche Appezzamento";
+            }
+        }
+
+        function rimuoviAppezzamento(id) {
+            if (confirm("Sei sicuro di voler rimuovere questo appezzamento?")) {
+                appezzamentiData = appezzamentiData.filter(a => a.id !== id);
+                salvaAppezzamenti();
+                visualizzaAppezzamentiManage();
+                if (editingAppezzamentoId === id) {
+                    pulisciFormAppezzamento();
+                }
+            }
+        }
+
+        function pulisciFormAppezzamento() {
+            appezzamentoIdInput.value = "";
+            appezzamentoNomeInput.value = "";
+            appezzamentoGruppoSelect.value = gruppiData.length > 0 ? gruppiData[0].nome : ''; // Seleziona il primo gruppo o vuoto
+            appezzamentoSuperficieInput.value = "";
+            editingAppezzamentoId = null;
+            aggiungiAppezzamentoButton.textContent = "Aggiungi Appezzamento";
+        }
+
+
+        // Funzioni per la gestione dei gruppi
+        function visualizzaGruppi() {
+            gruppiListDiv.innerHTML = '';
+            gruppiData.forEach(gruppo => {
+                const li = document.createElement("div");
+                li.classList.add("gruppo-list-item");
+                li.innerHTML = `<span>${gruppo.nome}</span>`;
+
+                const buttonsDiv = document.createElement("div");
+                const modificaGruppoBtn = document.createElement("button");
+                modificaGruppoBtn.textContent = "Modifica";
+                modificaGruppoBtn.classList.add("bg-yellow-500", "hover:bg-yellow-700", "text-white", "font-bold");
+                modificaGruppoBtn.addEventListener('click', () => modificaGruppo(gruppo.id));
+
+                const rimuoviGruppoBtn = document.createElement("button");
+                rimuoviGruppoBtn.textContent = "Rimuovi";
+                rimuoviGruppoBtn.classList.add("bg-red-500", "hover:bg-red-700", "text-white", "font-bold");
+                rimuoviGruppoBtn.addEventListener('click', () => rimuoviGruppo(gruppo.id));
+
+                buttonsDiv.appendChild(modificaGruppoBtn);
+                buttonsDiv.appendChild(rimuoviGruppoBtn);
+                li.appendChild(buttonsDiv);
+                gruppiListDiv.appendChild(li);
+            });
+        }
+
+        function aggiungiModificaGruppo() {
+            const nome = gruppoNomeInput.value.trim();
+
+            if (nome) {
+                if (editingGruppoId) {
+                    // Modalità modifica: aggiorna gruppo esistente
+                    const index = gruppiData.findIndex(g => g.id === editingGruppoId);
+                    if (index !== -1) {
+                        const oldGruppoName = gruppiData[index].nome;
+                        gruppiData[index].nome = nome;
+                        // Aggiorna anche gli appezzamenti che appartengono a questo gruppo
+                        appezzamentiData.forEach(app => {
+                            if (app.gruppo === oldGruppoName) {
+                                app.gruppo = nome;
+                            }
+                        });
+                        salvaAppezzamenti(); // Salva gli appezzamenti dopo aver aggiornato i nomi dei gruppi
+                    }
+                } else {
+                    // Modalità aggiungi: aggiungi nuovo gruppo
+                    // Controlla se il gruppo esiste già
+                    if (gruppiData.some(g => g.nome.toLowerCase() === nome.toLowerCase())) {
+                        alert("Un gruppo con questo nome esiste già.");
+                        return;
+                    }
+                    const nuovoGruppo = { id: Date.now(), nome: nome };
+                    gruppiData.push(nuovoGruppo);
+                }
+                salvaGruppi();
+                visualizzaGruppi();
+                populateGruppoSelect(); // Ricarica la select degli appezzamenti
+                pulisciFormGruppo();
+            } else {
+                alert("Inserisci un nome per il gruppo.");
+            }
+        }
+
+        function modificaGruppo(id) {
+            const gruppoDaModificare = gruppiData.find(g => g.id === id);
+            if (gruppoDaModificare) {
+                editingGruppoId = id;
+                gruppoNomeInput.value = gruppoDaModificare.nome;
+                aggiungiGruppoButton.textContent = "Salva Modifiche Gruppo";
+            }
+        }
+
+        function rimuoviGruppo(id) {
+            const gruppoDaRimuovere = gruppiData.find(g => g.id === id);
+            if (!gruppoDaRimuovere) return;
+
+            const nomeGruppoDaRimuovere = gruppoDaRimuovere.nome;
+            const appezzamentiNelGruppo = appezzamentiData.filter(app => app.gruppo === nomeGruppoDaRimuovere);
+
+            if (appezzamentiNelGruppo.length > 0) {
+                alert(`Impossibile rimuovere il gruppo "${nomeGruppoDaRimuovere}" perché contiene ancora ${appezzamentiNelGruppo.length} appezzamento/i. Sposta o rimuovi prima gli appezzamenti associati a questo gruppo.`);
+                return;
+            }
+
+            if (confirm(`Sei sicuro di voler rimuovere il gruppo "${nomeGruppoDaRimuovere}"?`)) {
+                gruppiData = gruppiData.filter(g => g.id !== id);
+                salvaGruppi();
+                visualizzaGruppi();
+                populateGruppoSelect();
+                pulisciFormGruppo();
+            }
+        }
+
+        function pulisciFormGruppo() {
+            gruppoIdInput.value = "";
+            gruppoNomeInput.value = "";
+            editingGruppoId = null;
+            aggiungiGruppoButton.textContent = "Aggiungi Gruppo";
+        }
+
+
+        // Event listener per il calcolo nella schermata principale
+        calcolaBottone.addEventListener("click", () => {
+            let ettariPerEttaro = parseFloat(ettariPerEttaroSelect.value);
+            let totaleEttari = 0;
+            const checkboxes = appezzamentiMainDiv.querySelectorAll('.appezzamento-checkbox:checked');
+
+            checkboxes.forEach(checkbox => {
+                totaleEttari += parseFloat(checkbox.value);
+            });
+
+            let totaleMiscela = totaleEttari * ettariPerEttaro;
+            risultatoMainDiv.textContent = `Totale ettolitri necessari: ${totaleMiscela.toFixed(2)} ettolitri, per un totale di ${totaleEttari.toFixed(2)} ettari`;
+        });
+
+        // Event listeners per i pulsanti di navigazione
+        modificaFondiButton.addEventListener("click", showManageScreen);
+        tornaAlCalcolatoreButton.addEventListener("click", showMainScreen);
+
+        // Event listeners per la gestione degli appezzamenti
+        aggiungiAppezzamentoButton.addEventListener("click", aggiungiAppezzamento);
+        annullaModificaAppezzamentoButton.addEventListener("click", pulisciFormAppezzamento);
+
+        // Event listeners per la gestione dei gruppi
+        aggiungiGruppoButton.addEventListener("click", aggiungiModificaGruppo);
+        annullaModificaGruppoButton.addEventListener("click", pulisciFormGruppo);
+
+
+        // Inizializzazione: Carica e visualizza i dati iniziali nella schermata principale
+        caricaDati();
+        showMainScreen(); // Mostra la schermata principale all'avvio
+    </script>
+</body>
+</html>
